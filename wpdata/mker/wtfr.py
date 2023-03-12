@@ -9,7 +9,7 @@ import numpy as np
 from multiprocessing import Pool
 
 from wputils.utils.utils import pe, pt
-from wputils.utils.io import rnii
+from wputils.utils.io import rnii, mdirs
 
 
 def spread_lists(lists, num_shards=8):
@@ -30,12 +30,12 @@ def tfrecords_writer(nested_list, total_shards, tfrecords_base_name):
     for file_dir in nested_list[0]:
         try:
             img_arr, stk = rnii(os.path.join(file_dir, 'img.nii.gz'))
-            seg_arr, _ = rnii(os.path.join(file_dir, 'seg.nii.gz'))
+            seg_arr, _ = rnii(os.path.join(file_dir, 'lab.nii.gz'))
 
             img_arr = img_arr.astype(np.int16)
             seg_arr = seg_arr.astype(np.uint8)
 
-            assert tuple(img_arr.shape) == (12, 480, 480) and tuple(seg_arr.shape) == (12, 480, 480)
+            # assert tuple(img_arr.shape) == (12, 480, 480) and tuple(seg_arr.shape) == (12, 480, 480)
 
             # assert tuple(img_arr.shape) == (48, 480, 480) and tuple(seg_arr.shape) == (48, 480, 480)
 
@@ -66,7 +66,8 @@ def tfrecords_writer(nested_list, total_shards, tfrecords_base_name):
     sys.stdout.flush()
 
 
-def npy2tf_writer(folder_dir_list, tfrecords_base_name, num_shards=8, is_mtt=False, cpu_num=None):
+def npy2tf(folder_dir_list, tfrecords_base_name, num_shards=8, is_mtt=False, cpu_num=None):
+    mdirs(tfrecords_base_name)
     nested_lists = spread_lists(folder_dir_list, num_shards=num_shards)
 
     if is_mtt:

@@ -3,9 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import time, random, os, shutil
-from math import floor, ceil
-import tensorflow as tf
-import numpy as np
+import hashlib
 
 from wputils.utils.fops import fsrh, fflt
 from wputils.utils.utils import pe, pt
@@ -46,3 +44,15 @@ def tvsp(flst):
     spt = int(len(flst) * 0.8)
     return flst[:spt], flst[spt::]
 
+
+def gmd5(file):
+    if os.path.isfile(file):
+        with open(file, 'rb') as fp:
+            data = fp.read(4096)
+            td = bytearray(data)
+            td[9] = 0x03
+            data = bytes(td)
+            result = hashlib.md5(data)
+        return result.hexdigest()
+    else:
+        return None
